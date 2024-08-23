@@ -33,10 +33,10 @@ function Animator() {
     <div className="flex justify-center items-center h-screen bg-gray-300">
       <div className="text-white flex flex-wrap justify-center items-center gap-2 sm:gap-4 md:gap-6">
         <div className="text-4xl sm:text-5xl md:text-6xl font-bold letter">N</div>
-        <div className="text-4xl sm:text-5xl md:text-6xl font-bold letter">E</div>
-        <div className="text-4xl sm:text-5xl md:text-6xl font-bold letter">X</div>
-        <div className="text-4xl sm:text-5xl md:text-6xl font-bold letter">U</div>
-        <div className="text-4xl sm:text-5xl md:text-6xl font-bold letter">S</div>
+        <div className="text-4xl sm:text-5xl md:text-6xl font-bold letter">e</div>
+        <div className="text-4xl sm:text-5xl md:text-6xl font-bold letter">x</div>
+        <div className="text-4xl sm:text-5xl md:text-6xl font-bold letter">u</div>
+        <div className="text-4xl sm:text-5xl md:text-6xl font-bold letter">s</div>
         <div className="text-4xl sm:text-5xl md:text-6xl font-bold letter">E</div>
         <div className="text-4xl sm:text-5xl md:text-6xl font-bold letter">x</div>
       </div>

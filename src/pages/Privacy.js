@@ -1,6 +1,6 @@
 // src/components/PrivacyPolicy.js
 import React from 'react';
-import Pagination from '../components/Pagination';
+import BackButton from '../components/BackButton';
 
 const Privacy = () => {
   return (
@@ -48,7 +48,7 @@ const Privacy = () => {
       <p className="text-gray-600 mb-4">
         If you have any questions about this Privacy Policy, please contact us at privacy@NexusEx.com.
       </p>
-      <Pagination prevLink="/terms-of-service" nextLink="#" />
+      <BackButton />
     </div>
   );
 };

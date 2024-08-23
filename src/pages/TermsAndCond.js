@@ -1,6 +1,6 @@
 // src/components/TermsOfService.js
 import React from 'react';
-import Pagination from '../components/Pagination';
+import BackButton from '../components/BackButton';
 
 const TermsAndCond = () => {
   return (
@@ -51,7 +51,7 @@ const TermsAndCond = () => {
       <p className="text-gray-600 mb-4">
         If you have any questions about these Terms, please contact us at support@NexusEx.com.
       </p>
-      <Pagination prevLink="/terms-of-service" nextLink="#" />
+      <BackButton />
     </div>
   );
 };

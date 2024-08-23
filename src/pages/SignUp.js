@@ -1,5 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
+import BackButton from '../components/BackButton'
 
 function SignUp() {
   return (
@@ -84,6 +85,7 @@ function SignUp() {
             </NavLink>
         </div>
     </form>
+    <BackButton />
 
     </>
   )
