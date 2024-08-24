@@ -1,4 +1,6 @@
 import React from 'react';
+import ChatButton from './ChatButton'
+import { useNavigate } from 'react-router-dom';
 
 const images = [
   {
@@ -55,9 +57,10 @@ const faqs = [
 ];
 
 function Sections() {
+  const navigate = useNavigate();
+
   return (
-<>
-      {/* Intro Banner Section */}
+<>{/* Intro Banner Section */}
       <section className="bg-blue-500 text-white py-24">
         <div className="container mx-auto px-4 text-center">
           <div className="relative">
@@ -72,6 +75,38 @@ function Sections() {
           </div>
         </div>
       </section>
+
+      {/* Add Blog and Read Blog Buttons Section */}
+<section
+  className="relative bg-cover bg-center py-16"
+  style={{ backgroundImage: "url('images/Blogpicture.jpg')" }} // Add your background image path here
+>
+  {/* Overlay */}
+  <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+
+  {/* Content */}
+  <div className="relative container mx-auto px-4 text-center">
+    <h2 className="text-4xl font-bold text-white mb-8">Explore Our Blogs</h2>
+    <p className="text-lg text-gray-300 mb-10 max-w-2xl mx-auto">
+      Share your thoughts and read insightful posts from our community. Get involved in discussions and explore various perspectives.
+    </p>
+    <div className="flex flex-wrap justify-center gap-6">
+      <button
+        className="bg-green-600 text-white px-6 py-3 rounded-full font-bold shadow-lg hover:bg-green-700 transform hover:scale-105 transition-transform duration-300"
+        onClick={() => navigate("/blog/new")}
+      >
+        Add Blog
+      </button>
+      <button
+        className="bg-blue-600 text-white px-6 py-3 rounded-full font-bold shadow-lg hover:bg-blue-700 transform hover:scale-105 transition-transform duration-300"
+        onClick={() => navigate("/blog")}
+      >
+        Read Blogs
+      </button>
+    </div>
+  </div>
+</section>
+
 
       {/* Features Section */}
       <section className="bg-gray-100 py-16">
@@ -146,6 +181,7 @@ function Sections() {
           </div>
         </div>
       </section>
+      <ChatButton />
     </>
   );
 }
