@@ -1,5 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Transition } from '@headlessui/react';
 import BackButton from '../components/BackButton';
+import { useSwipeable } from 'react-swipeable';
+import { auth, db } from '../FireBase/firebase';
+import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } from 'firebase/firestore';
 
 const contacts = [
   { id: 1, name: 'Alice', image: '/images/usage.jpg', recentMessage: 'Hey there! How are you?' },
@@ -8,157 +12,154 @@ const contacts = [
 ];
 
 const ChatPage = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const menuRef = useRef(null);
-  const buttonRef = useRef(null);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const handleClickOutside = (event) => {
-    if (
-      menuRef.current &&
-      !menuRef.current.contains(event.target) &&
-      buttonRef.current &&
-      !buttonRef.current.contains(event.target)
-    ) {
-      setIsMenuOpen(false);
-    }
-  };
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
+    let unsubscribe;
+
+    if (selectedContact) {
+      const chatId = `chat_${selectedContact.id}`;
+      const q = query(collection(db, "chats", chatId, "messages"), orderBy("timestamp", "asc"));
+
+      unsubscribe = onSnapshot(q, (snapshot) => {
+        const msgs = snapshot.docs.map((doc) => doc.data());
+        setMessages(msgs);
+      });
+    }
+
+    return () => unsubscribe && unsubscribe();
+  }, [selectedContact]);
 
   const handleContactClick = (contact) => {
     setSelectedContact(contact);
-    // Load or clear messages based on selected contact
-    // Example: setMessages([...]); or setMessages([]) if you want to clear messages
+    setShowChat(true);
   };
 
-  const handleSendMessage = () => {
+  const handleBackToContacts = () => {
+    setShowChat(false);
+  };
+
+  const handleSendMessage = async () => {
     if (newMessage.trim() && selectedContact) {
-      setMessages([...messages, newMessage]);
+      const chatId = `chat_${selectedContact.id}`;
+      await addDoc(collection(db, "chats", chatId, "messages"), {
+        senderId: auth.currentUser.uid,
+        message: newMessage,
+        timestamp: serverTimestamp(),
+      });
       setNewMessage('');
     }
   };
 
+  const handlers = useSwipeable({
+    onSwipedRight: () => setShowChat(false),
+    onSwipedLeft: () => selectedContact && setShowChat(true),
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: true,
+  });
+
   return (
-    <div className="flex flex-col h-screen md:flex-row bg-gray-100">
-      {/* Sidebar */}
-      <div className="w-full md:w-1/4 bg-white border-r border-gray-200 md:border-none shadow-md md:shadow-none md:relative">
-        {/* Sidebar Header */}
-        <header className="p-4 border-b border-gray-200 flex justify-between items-center bg-blue-500 text-white">
-          <h1 className="text-2xl font-semibold">Chat Web</h1>
-          <div className="relative">
-            <button
-              ref={buttonRef}
-              onClick={toggleMenu}
-              className="focus:outline-none"
-            >
+    <div {...handlers} className="relative h-screen w-screen overflow-hidden bg-gray-100">
+      {/* Contacts Screen */}
+      <Transition
+        show={!showChat}
+        enter="transform transition-transform duration-500"
+        enterFrom="-translate-x-full"
+        enterTo="translate-x-0"
+        leave="transform transition-transform duration-500"
+        leaveFrom="translate-x-0"
+        leaveTo="-translate-x-full"
+      >
+        <div className="absolute inset-0 flex flex-col bg-white">
+          <header className="p-4 bg-blue-500 text-white flex justify-between items-center shadow-lg">
+            <h1 className="text-2xl font-semibold">Friends</h1>
+            <div className="flex items-center space-x-4">
+              <BackButton />
+            </div>
+          </header>
+          <div className="flex-1 overflow-y-auto p-3 bg-gray-50">
+            {contacts.map((contact) => (
+              <div
+                key={contact.id}
+                onClick={() => handleContactClick(contact)}
+                className="flex items-center p-3 cursor-pointer hover:bg-gray-100 border-b border-gray-200 rounded-lg transition-all"
+              >
+                <img
+                  src={contact.image}
+                  alt={contact.name}
+                  className="w-12 h-12 rounded-full mr-3"
+                />
+                <div className="flex-1">
+                  <div className="font-semibold text-gray-800">{contact.name}</div>
+                  <div className="text-gray-600 text-sm">{contact.recentMessage}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Transition>
+
+      {/* Chat Screen */}
+      <Transition
+        show={showChat}
+        enter="transform transition-transform duration-500"
+        enterFrom="translate-x-full"
+        enterTo="translate-x-0"
+        leave="transform transition-transform duration-500"
+        leaveFrom="translate-x-0"
+        leaveTo="translate-x-full"
+      >
+        <div className="absolute inset-0 flex flex-col bg-white">
+          <header className="bg-gray-800 p-4 text-white flex justify-between items-center shadow-lg">
+            <button onClick={handleBackToContacts} className="focus:outline-none">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6"
+                fill="none"
                 viewBox="0 0 24 24"
-                fill="currentColor"
+                stroke="currentColor"
               >
-                <path d="M12 6a2 2 0 100 4 2 2 0 000-4z" />
-                <path d="M4 12a2 2 0 012-2h12a2 2 0 012 2 2 2 0 01-2 2H6a2 2 0 01-2-2z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
-            {/* Menu Dropdown */}
-            <div
-              ref={menuRef}
-              className={`absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg ${isMenuOpen ? '' : 'hidden'} md:hidden`}
-            >
-              <ul className="py-2 px-3">
-                <li>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                  >
-                    Groups
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                  >
-                    Sign Out
-                  </a>
-                </li>
-                <li>
-                  <BackButton />
-                </li>
-                {/* Add more menu options here */}
-              </ul>
-            </div>
+            <h1 className="text-2xl font-semibold">{selectedContact ? selectedContact.name : 'Chat'}</h1>
+          </header>
+          <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+            {messages.map((msg, index) => (
+              <div key={index} className="mb-2">
+                <div className="bg-blue-500 text-white p-3 rounded-lg shadow-sm w-fit max-w-xs">
+                  {msg.message}
+                </div>
+              </div>
+            ))}
           </div>
-        </header>
-        {/* Contact List */}
-        <div className="overflow-y-auto h-screen p-3 bg-gray-50">
-          {contacts.map((contact) => (
-            <div
-              key={contact.id}
-              onClick={() => handleContactClick(contact)}
-              className="flex items-center p-3 cursor-pointer hover:bg-gray-100 border-b border-gray-200 rounded-lg transition-colors"
-            >
-              <img
-                src={contact.image}
-                alt={contact.name}
-                className="w-12 h-12 rounded-full mr-3"
+          <footer className="p-4 bg-white shadow-lg sticky bottom-0">
+            <div className="flex items-center">
+              <input
+                type="text"
+                placeholder="Type a message..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                className="w-full p-3 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
               />
-              <div className="flex-1">
-                <div className="font-semibold text-gray-800">{contact.name}</div>
-                <div className="text-gray-600 text-sm">{contact.recentMessage}</div>
-              </div>
+              <button
+                onClick={handleSendMessage}
+                className="ml-3 bg-gray-700 text-white p-3 rounded-full"
+              >
+                Send
+              </button>
             </div>
-          ))}
+          </footer>
         </div>
-      </div>
-      {/* Main Chat Area */}
-      <div className="flex-1 relative flex flex-col">
-        {/* Chat Header */}
-        <header className="bg-white p-4 text-gray-700 border-b border-gray-200 shadow-md">
-          <h1 className="text-2xl font-semibold">{selectedContact ? selectedContact.name : 'Select a Contact'}</h1>
-        </header>
-        {/* Chat Messages */}
-        <div className="flex-1 overflow-y-auto p-4 bg-gray-50 ">
-          {messages.map((msg, index) => (
-            <div key={index} className="mb-2">
-              <div className="bg-white p-3 rounded-lg shadow-sm text-gray-800 w-50">
-                {msg}
-              </div>
-            </div>
-          ))}
-        </div>
-        {/* Chat Input */}
-        <footer className="bg-white border-t border-gray-200 p-4 shadow-md">
-          <div className="flex items-center">
-            <input
-              type="text"
-              placeholder="Type a message..."
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500"
-            />
-            <button 
-              onClick={handleSendMessage} 
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg ml-3"
-            >
-              Send
-            </button>
-          </div>
-        </footer>
-      </div>
+      </Transition>
     </div>
   );
 };

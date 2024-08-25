@@ -68,7 +68,7 @@ function Header() {
         {/* Menu items */}
         <li>
           <NavLink
-            to="#"
+            to="/comingsoon"
             className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
           >
             <svg
@@ -110,7 +110,7 @@ function Header() {
         </li>
         <li>
           <NavLink
-            to="/signup"
+            to="/comingsoon"
             className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
           >
             <svg
@@ -125,7 +125,7 @@ function Header() {
             <span className="ms-3">Sign Up</span>
           </NavLink>
         </li>
-        <li>
+        {/* <li> 
           <NavLink
             to="#"
             className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
@@ -141,7 +141,7 @@ function Header() {
             </svg>
             <span className="ms-3">Sign out</span>
           </NavLink>
-        </li>
+        </li> */}
       </ul>
                </div>
               <div className="flex items-center gap-3">

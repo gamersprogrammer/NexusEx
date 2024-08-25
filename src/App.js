@@ -4,7 +4,6 @@ import { useState } from 'react';
 import SignUp from './pages/SignUp';
 import Contact from './pages/Contact';
 import Header from './components/Header';
-import SignIn from './pages/SignIn';
 import ChatPage from './pages/ChatPage';
 import ComingSoon from './pages/ComingSoon';
 import Privacy from './pages/Privacy';
@@ -13,6 +12,7 @@ import Animator from './components/Animator';
 import BlogForm from './pages/BlogForm';
 import BlogList from './pages/BlogList';
 import BlogDetail from './pages/BlogDetail';
+import Dashboard from './pages/Dashboard';
 function App() {
   const [blogs, setBlogs] = useState([]);
 
@@ -50,12 +50,12 @@ function App() {
         <Route path="/home" element={<Header />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path='/signin' element={<SignIn />} />
         <Route path='/chatpage' element={<ChatPage />} />
         <Route path='/comingsoon' element={<ComingSoon />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms-and-conditions" element={<TermsAndCond />} />
         <Route path = "/contact" element={<Contact />} />
+        <Route path = "/dashboard" element={<Dashboard />} />
         <Route
           path="/blog/new"
           element={<BlogForm addBlog={addBlog} />}
